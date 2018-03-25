@@ -60,12 +60,7 @@ $(document).ready(function() {
     var next = childSnapshot.val().next;
     var minAway = parseInt(childSnapshot.val().minAway);
 
-    // console.log(name);
-    // console.log(destination);
-    // console.log(frequency);
-    // console.log(next);
-  
-    // // // Change the HTML to reflect
+    // Prepare the train variable table data, table row and table body html elements
     var tBody = $('.train-board');
     var tRow = $('<tr>');
     var nameTd = $('<td class="name">').text(name);
@@ -73,8 +68,8 @@ $(document).ready(function() {
     var startTd = $('<td class="start">').text(frequency);
     var nextTd = $('<td class="next">').text('$' + next);;
 
-    // Adds new employee to the DOM
-    tRow.append(nameTd, roleTd, startTd, workedTd, nextTd, billedTd);
+    // Adds trains. Add the table data to the table row and add the row to the train board
+    tRow.append(nameTd, roleTd, startTd, nextTd, billedTd);
     tBody.append(tRow);
 
 
