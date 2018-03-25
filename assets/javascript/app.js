@@ -1,56 +1,86 @@
+// Thomas the Train Tracker
 
-// Wait for the page to finish loading
+
+// Wait for the page to finish loading and set up firebase
+// ===========================================================================
 $(document).ready(function() {
 
   var config = {
-    apiKey: "AIzaSyDKWABfmD5z9i_HHVeWAbSxukH1yZqeoAE",
-    authDomain: "susangt2018.firebaseapp.com",
-    databaseURL: "https://susangt2018.firebaseio.com",
-    projectId: "susangt2018",
-    storageBucket: "susangt2018.appspot.com",
-    messagingSenderId: "271189265430"
+    apiKey: "AIzaSyDJOoAuDN_nvZXyWrPfRFt9zh_hsdhSgGQ",
+    authDomain: "train-2f8b9.firebaseapp.com",
+    databaseURL: "https://train-2f8b9.firebaseio.com",
+    projectId: "train-2f8b9",
+    storageBucket: "train-2f8b9.appspot.com",
+    messagingSenderId: "915229857323"
   };
   firebase.initializeApp(config);
   var database = firebase.database();
-  
+// ===========================================================================
+
+// On click for the form to submit
+// ===========================================================================
+  var currentDate = moment(Date()).format('MMDDYYYY');
+
   $('button').on('click', function() {
+    var name = $('#name').val().trim();
+    var destination = $('#destination').val().trim();
+    var frequency = $('#frequency').val().trim();
+    var firstTrain = $('#firstTrain').val().trim();
 
-  var name = $('#name').val().trim();
-  var role = $('#role').val().trim();
-  var startDate = $('#startDate').val().trim();
-  var worked = 0;
-  var rate = $('#rate').val().trim();
-  var billed = 0;
+    var next = 0;
+    var minAway = 0; 
+
+    next = firstTrain + parseInt(frequency);
+    console.log(name,destination,frequency,firstTrain,next,minAway); 
+
+    
+    var newTrain = {
+      name: name,
+      destination: destination, 
+      frequency: frequency,
+      firstTrain: firstTrain,
+      next: next,
+      minAway: minAway
+    };
+
+
+    database.ref().push(newTrain); 
+    
   
-  console.log(name);
-  console.log(role);
-  console.log(startDate);
-  console.log(rate);
+  }); // END button click to add employee
+  
+  // database.ref().orderByChild('dateAdded').limitToLast(1).on("child_added", function(snapshot){});  
+    
+  // This event will be triggered once for each initial child at this location, and it will be triggered again every time a new child is added. 
+  database.ref().on("child_added", function(childSnapshot, prevChildKey) {
+    // console.log(snapshot.val());
+    var name = childSnapshot.val().name;
+    var destination = childSnapshot.val().destination;
+    var frequency = childSnapshot.val().frequency;
+    var next = childSnapshot.val().next;
+    var minAway = parseInt(childSnapshot.val().minAway);
 
-  var tBody = $('.employee-board');
-  var tRow = $('<tr>');
+    // console.log(name);
+    // console.log(destination);
+    // console.log(frequency);
+    // console.log(next);
+  
+    // // // Change the HTML to reflect
+    var tBody = $('.train-board');
+    var tRow = $('<tr>');
+    var nameTd = $('<td class="name">').text(name);
+    var roleTd = $('<td class="destination">').text(destination);
+    var startTd = $('<td class="start">').text(frequency);
+    var nextTd = $('<td class="next">').text('$' + next);;
 
-  var nameTd = $('<td>').text(name);
-  var roleTd = $('<td>').text(role);
-  var startTd = $('<td>').text(startDate);
-  var rateTd = $('<td>').text(rate);
+    // Adds new employee to the DOM
+    tRow.append(nameTd, roleTd, startTd, workedTd, nextTd, billedTd);
+    tBody.append(tRow);
 
-  console.log(nameTd);
 
-  tRow.append(nameTd, roleTd, startTd, rateTd);
-  tBody.append(tRow);
-
-  database.ref().push({
-    name: name,
-    role: role,
-    startDate: startDate,
-    rate: rate,
-    dateAdded: firebase.database.ServerValue.TIMESTAMP
-
+    // Handle the errors
+  }, function(errorObject) {
+    console.log("Errors handled: " + errorObject.code);
   });
-
-  }); 
-
-  
 
 });
