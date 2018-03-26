@@ -19,7 +19,7 @@ $(document).ready(function() {
 
 // On click for the form to submit
 // ===========================================================================
-  var currentDate = moment(Date()).format('MMDDYYYY');
+  
 
   $('button').on('click', function() {
     var name = $('#name').val().trim();
@@ -27,49 +27,53 @@ $(document).ready(function() {
     var frequency = $('#frequency').val().trim();
     var firstTrain = $('#firstTrain').val().trim();
 
-    var next = 0;
-    var minAway = 0; 
+    firstTrainCon = moment(firstTrain, "HH:mm");
+        console.log(firstTrainCon); 
 
-    next = firstTrain + parseInt(frequency);
-    console.log(name,destination,frequency,firstTrain,next,minAway); 
+    var currentTime = moment();
+    console.log('CURRENT TIME: '+moment(currentTime).format("hh:mm"));
 
+    var diffTime = moment().diff(moment(firstTrainCon), 'minutes');
+    console.log('difference in Time: '+ diffTime);
+
+    var tRemainder = diffTime % frequency;
+    console.log('remainder' + tRemainder);
+
+    var minAway = frequency - tRemainder;
     
     var newTrain = {
       name: name,
       destination: destination, 
       frequency: frequency,
       firstTrain: firstTrain,
-      next: next,
+      diffTime:  diffTime,
       minAway: minAway
     };
 
-
     database.ref().push(newTrain); 
-    
-  
-  }); // END button click to add employee
-  
-  // database.ref().orderByChild('dateAdded').limitToLast(1).on("child_added", function(snapshot){});  
-    
-  // This event will be triggered once for each initial child at this location, and it will be triggered again every time a new child is added. 
+      
+  }); 
+
+
   database.ref().on("child_added", function(childSnapshot, prevChildKey) {
-    // console.log(snapshot.val());
     var name = childSnapshot.val().name;
     var destination = childSnapshot.val().destination;
     var frequency = childSnapshot.val().frequency;
-    var next = childSnapshot.val().next;
+    var diffTime = childSnapshot.val().diffTime;
     var minAway = parseInt(childSnapshot.val().minAway);
 
     // Prepare the train variable table data, table row and table body html elements
     var tBody = $('.train-board');
     var tRow = $('<tr>');
+
     var nameTd = $('<td class="name">').text(name);
-    var roleTd = $('<td class="destination">').text(destination);
-    var startTd = $('<td class="start">').text(frequency);
-    var nextTd = $('<td class="next">').text('$' + next);;
+    var destinationTd = $('<td class="destination">').text(destination);
+    var freqTd = $('<td class="start">').text(frequency);
+    var diffTimeTd = $('<td class="next">').text('$' + diffTime);;
+    var minTd = $('<td class="minAway">').text('$' + minAway);;
 
     // Adds trains. Add the table data to the table row and add the row to the train board
-    tRow.append(nameTd, roleTd, startTd, nextTd, billedTd);
+    tRow.append(nameTd, destinationTd, freqTd,  diffTimeTd,minTd);
     tBody.append(tRow);
 
 
