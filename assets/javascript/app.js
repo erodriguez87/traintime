@@ -28,7 +28,6 @@ $(document).ready(function() {
     var firstTrain = $('#firstTrain').val().trim();
 
     firstTrainCon = moment(firstTrain, "HH:mm");
-        console.log(firstTrainCon); 
 
     var currentTime = moment();
     console.log('CURRENT TIME: '+moment(currentTime).format("hh:mm"));
@@ -36,18 +35,26 @@ $(document).ready(function() {
     var diffTime = moment().diff(moment(firstTrainCon), 'minutes');
     console.log('difference in Time: '+ diffTime);
 
+    // How many minutes are left
     var tRemainder = diffTime % frequency;
     console.log('remainder' + tRemainder);
-
+    // How many minutes away is the next train
     var minAway = frequency - tRemainder;
+    console.log('min away ' + minAway);
+
+    var nextTrain = moment().add(minAway, "minutes");
     
+    nextTrain = moment(nextTrain).format("hh:mm");
+    console.log('next train ' + nextTrain);
+
     var newTrain = {
       name: name,
       destination: destination, 
       frequency: frequency,
       firstTrain: firstTrain,
       diffTime:  diffTime,
-      minAway: minAway
+      minAway: minAway,
+      nextTrain: nextTrain
     };
 
     database.ref().push(newTrain); 
@@ -61,6 +68,7 @@ $(document).ready(function() {
     var frequency = childSnapshot.val().frequency;
     var diffTime = childSnapshot.val().diffTime;
     var minAway = parseInt(childSnapshot.val().minAway);
+    var nextTrain = childSnapshot.val().nextTrain;
 
     // Prepare the train variable table data, table row and table body html elements
     var tBody = $('.train-board');
@@ -69,11 +77,11 @@ $(document).ready(function() {
     var nameTd = $('<td class="name">').text(name);
     var destinationTd = $('<td class="destination">').text(destination);
     var freqTd = $('<td class="start">').text(frequency);
-    var diffTimeTd = $('<td class="next">').text('$' + diffTime);;
-    var minTd = $('<td class="minAway">').text('$' + minAway);;
+    var nextTd = $('<td class="next">').text(nextTrain);;
+    var minTd = $('<td class="minAway">').text(minAway);;
 
     // Adds trains. Add the table data to the table row and add the row to the train board
-    tRow.append(nameTd, destinationTd, freqTd,  diffTimeTd,minTd);
+    tRow.append(nameTd, destinationTd, freqTd, nextTd,minTd);
     tBody.append(tRow);
 
 
